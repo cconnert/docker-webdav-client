@@ -29,7 +29,7 @@ ENV WEBDRIVE_MOUNT=/mnt/webdrive
 # DAVFS2_ASK_AUTH=0 will set the davfs2 configuration option ask_auth to 0 for
 # that share. See the manual for the list of available options.
 
-RUN apk --no-cache add ca-certificates davfs2 tini bash rsync
+RUN apk --no-cache add ca-certificates davfs2 tini bash rsync rclone
 
 COPY *.sh /usr/local/bin/
 
