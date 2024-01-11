@@ -7,12 +7,12 @@ exit_script() {
     signal="$1"
     exit_code="$2"
     echo "Caught $signal! Unmounting ${DEST}..."
-    umount -l ${DEST}
-    sleep 1
+    sync -f "${DEST}"
+    umount -l "${DEST}"
     dav2fs=$(ps -o pid= -o comm= | grep mount.davfs | sed -E 's/\s*(\d+)\s+.*/\1/g')
     if [ -n "$dav2fs" ]; then
-        echo "Terminating davfs: $dav2fs"
-        while $(kill $dav2fs 2> /dev/null); do
+        while $(kill -0 $dav2fs 2> /dev/null); do
+            echo "Waiting for davfs (pid: $dav2fs) to terminate..."
             sleep 1
         done
     fi
