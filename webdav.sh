@@ -1,4 +1,4 @@
-#! /usr/bin/env sh
+#! /usr/bin/env bash
 
 # Where are we going to mount the remote webdav resource in our container.
 DEST=${WEBDRIVE_MOUNT:-/mnt/webdrive}
@@ -53,10 +53,14 @@ fi
 # Mount and verify that something is present. davfs2 always creates a lost+found
 # sub-directory, so we can use the presence of some file/dir as a marker to
 # detect that mounting was a success. Execute the command on success.
+. /usr/local/bin/trap.sh
+echo "Installed signal handler"
 mount -t davfs $WEBDRIVE_URL $DEST -o uid=$OWNER,gid=users,dir_mode=755,file_mode=755
 if [ -n "$(ls -1A $DEST)" ]; then
     echo "Mounted $WEBDRIVE_URL onto $DEST"
-    exec "$@"
+    "$@"
+    status=$?
+    exit $status
 else
     echo "Nothing found in $DEST, giving up!"
 fi

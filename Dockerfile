@@ -1,13 +1,13 @@
-FROM alpine:3.18.3
+FROM alpine:3.19.0
 
 # Metadata
 LABEL MAINTAINER=efrecon+github@gmail.com
-LABEL org.opencontainers.image.title="efrecon/webdav-client"
-LABEL org.opencontainers.image.description="Mount WebDAV shares from within a container and expose them to host/containers"
-LABEL org.opencontainers.image.authors="Emmanuel Frécon <efrecon+github@gmail.com>"
-LABEL org.opencontainers.image.url="https://github.com/efrecon/docker-webdav-client"
-LABEL org.opencontainers.image.documentation="https://github.com/efrecon/docker-webdav-client/README.md"
-LABEL org.opencontainers.image.source="https://github.com/efrecon/docker-webdav-client/Dockerfile"
+LABEL org.opencontainers.image.title="cconnert/webdav-fs"
+LABEL org.opencontainers.image.description="Mount/Umount WebDAV shares from within a container and execute command while volume is mounted"
+LABEL org.opencontainers.image.authors="christian connert <efrecon+github@gmail.com>"
+LABEL org.opencontainers.image.url="https://github.com/cconnert/docker-webdav-fs"
+LABEL org.opencontainers.image.documentation="https://github.com/cconnert/docker-webdav-fs/README.md"
+LABEL org.opencontainers.image.source="https://github.com/cconnert/docker-webdav-fs/Containerfile"
 
 # Specify URL, username and password to communicate with the remote webdav
 # resource. When using _FILE, the password will be read from that file itself,
@@ -29,7 +29,7 @@ ENV WEBDRIVE_MOUNT=/mnt/webdrive
 # DAVFS2_ASK_AUTH=0 will set the davfs2 configuration option ask_auth to 0 for
 # that share. See the manual for the list of available options.
 
-RUN apk --no-cache add ca-certificates davfs2 tini
+RUN apk --no-cache add ca-certificates davfs2 tini bash rsync
 
 COPY *.sh /usr/local/bin/
 
@@ -40,5 +40,5 @@ VOLUME [ "/mnt/webdrive" ]
 # to then have a command that will keep listing the files under the main share.
 # Listing the files will keep the share active and avoid that the remote server
 # closes the connection.
-ENTRYPOINT [ "tini", "-g", "--", "/usr/local/bin/docker-entrypoint.sh" ]
-CMD [ "ls.sh" ]
+ENTRYPOINT [ "tini", "-g", "--" ]
+CMD [ "/usr/local/bin/webdav.sh", "ls.sh" ]
