@@ -1,6 +1,6 @@
 # Dockerised WebDAV Client
 
-This Docker [image] (also at the [GHCR]) and associated [project] facilitate
+This Docker [image] and associated [project] facilitate
 mounting of remote WebDAV resources into containers. Mounting is implemented
 using [davfs2] and the image makes it possible to set all supported davfs
 [configuration] options for the share. The image basically implements a docker
@@ -10,9 +10,8 @@ directory will make the content of the bucket available to processes, but also
 all other containers on the host. The image automatically unmounts the remote
 bucket on container termination.
 
-  [image]: https://hub.docker.com/r/efrecon/webdav-client
-  [GHCR]: https://github.com/efrecon/docker-webdav-client/pkgs/container/webdav-client
-  [project]: https://github.com/efrecon/docker-webdav-client
+  [image]: https://hub.docker.com/r/cconnert/webdav-fs
+  [project]: https://github.com/cconnert/docker-webdav-fs
   [davfs2]: http://savannah.nongnu.org/projects/davfs2
   [configuration]: https://man.cx/davfs2.conf(5)
   [volume]: https://docs.docker.com/storage/
@@ -35,7 +34,7 @@ docker run -it --rm \
     --env "WEBDRIVE_URL=https://dav.box.com/dav" \
     --env "DAVFS2_ASK_AUTH=0" \
     -v /mnt/tmp:/mnt/webdrive:rshared \
-    efrecon/webdav-client
+    cconnert/webdav-fs
 ```
 
 The `--device`, `--cap-add` and `--security-opt` options and their values are to
@@ -76,16 +75,17 @@ davfs2 option called `ask_auth` to `0`, you would set the environment variable
 
 By default, containers based on this image will keep listing the content of the
 mounted directory at regular intervals. This is implemented by the
-[command](./ls.sh) that it is designed to execute once the remote WebDAV
-resource has been mounted. If you did not wish this behaviour, pass `empty.sh`
-as the command instead.
+[webdav.sh ls.h](./webdav.sh) script(s). `webdav.sh` is designed to, install the signal handlers, 
+mount the remote WebDAV resource execute the provided command and properly unmount the WebDAV resource.
+The [ls.h](./ls.h) script will periodically list the content of the WebDAV resource.
+If you did not wish this behaviour, pass `webdav.sh empty.sh` as the command instead.
 
 Note that both of these commands ensure that the remote WebDAV resource is
 unmounted from the mountpoint at termination, so you should really pick one or
 the other to allow for proper operation. If the mountpoint was not unmounted,
 your mount system will be unstable as it will contain an unknown entry.
 
-Automatic unmounting is achieved through a combination of a `trap` in the
+Automatic unmounting is achieved through a combination of a `trap` (see [trap.sh](./trap.sh)) in the
 command being executed and [tini]. [tini] is made available directly in this
 image to make it possible to run in [Swarm] environments.
 
